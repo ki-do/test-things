@@ -91,7 +91,7 @@ if (tmPath != null && tmPath !== "") {
 
 const placeholderReplacer = new JsonPlaceholderReplacer();
 placeholderReplacer.addVariableMap({
-    PROTOCOL: "http",
+    PROTOCOL: "https",
     THING_NAME: thingName,
     HOSTNAME: hostname,
     PORT_NUMBER: portNumber,
@@ -203,7 +203,7 @@ setObject({ id: 123, name: "abc" });
 const servient = new Servient();
 servient.addServer(
     new HttpServer({
-        baseUri: `http://${hostname}:${portNumber}`,
+        baseUri: `https://${hostname}:${portNumber}`,
         port: portNumber,
     })
 );

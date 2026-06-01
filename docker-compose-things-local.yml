@@ -29,6 +29,10 @@ services:
             dockerfile: ./http/express/Dockerfile-simple
         labels:
             - traefik.http.routers.http-express-calculator-simple.rule=PathPrefix(`/http-express-calculator-simple`)
+            - traefik.http.routers.http-express-calculator-simple.entrypoints=web
+            - traefik.http.routers.http-express-calculator-simple-secure.rule=PathPrefix(`/http-express-calculator-simple`)
+            - traefik.http.routers.http-express-calculator-simple-secure.entrypoints=websecure
+            - traefik.http.routers.http-express-calculator-simple-secure.tls=true
             - traefik.http.services.http-express-calculator-simple.loadbalancer.server.port=${WEB_PORT_OUT}
         environment:
             - HOSTNAME=${STACK_HOSTNAME}
@@ -104,8 +108,12 @@ services:
             context: .
             dockerfile: ./things/advanced-coffee-machine/http/ts/Dockerfile
         labels:
-            - traefik.http.routers.http-advanced-coffee-machine.rule=PathPrefix(`/http-advanced-coffee-machine`)
-            - traefik.http.services.http-advanced-coffee-machine.loadbalancer.server.port=${WEB_PORT_OUT}
+        - traefik.http.routers.http-advanced-coffee-machine.rule=PathPrefix(`/http-advanced-coffee-machine`)
+        - traefik.http.routers.http-advanced-coffee-machine.entrypoints=web
+        - traefik.http.routers.http-advanced-coffee-machine-secure.rule=PathPrefix(`/http-advanced-coffee-machine`)
+        - traefik.http.routers.http-advanced-coffee-machine-secure.entrypoints=websecure
+        - traefik.http.routers.http-advanced-coffee-machine-secure.tls=true
+        - traefik.http.services.http-advanced-coffee-machine.loadbalancer.server.port=${WEB_PORT_OUT}
         environment:
             - HOSTNAME=${STACK_HOSTNAME}
             - PORT=${WEB_PORT_OUT}
@@ -118,6 +126,10 @@ services:
             dockerfile: ./http/ts/Dockerfile
         labels:
             - traefik.http.routers.http-data-schema-thing.rule=PathPrefix(`/http-data-schema-thing`)
+            - traefik.http.routers.http-data-schema-thing.entrypoints=web
+            - traefik.http.routers.http-data-schema-thing-secure.rule=PathPrefix(`/http-data-schema-thing`)
+            - traefik.http.routers.http-data-schema-thing-secure.entrypoints=websecure
+            - traefik.http.routers.http-data-schema-thing-secure.tls=true
             - traefik.http.services.http-data-schema-thing.loadbalancer.server.port=${WEB_PORT_OUT}
         environment:
             - HOSTNAME=${STACK_HOSTNAME}
