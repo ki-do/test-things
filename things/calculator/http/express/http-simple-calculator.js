@@ -32,7 +32,10 @@ const thingName = "http-express-calculator-simple";
 const protocol = (process.env.PROTOCOL ?? "https").toLowerCase();
 const defaultExternalPort = protocol === "http" ? 80 : 443;
 
-const externalPort = process.env.EXTERNAL_PORT != null && process.env.EXTERNAL_PORT !== "" ? parseInt(process.env.EXTERNAL_PORT) : defaultExternalPort;
+const externalPort =
+    process.env.EXTERNAL_PORT != null && process.env.EXTERNAL_PORT !== ""
+        ? parseInt(process.env.EXTERNAL_PORT)
+        : defaultExternalPort;
 
 const baseUri = externalPort === defaultExternalPort ? `${hostname}` : `${hostname}:${externalPort}`;
 

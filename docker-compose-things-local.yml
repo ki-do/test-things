@@ -113,9 +113,9 @@ services:
             context: .
             dockerfile: ./things/advanced-coffee-machine/http/ts/Dockerfile
         labels:
-        - traefik.http.routers.http-advanced-coffee-machine.rule=PathPrefix(`/http-advanced-coffee-machine`)
-        - traefik.http.routers.http-advanced-coffee-machine.entrypoints=web
-        - traefik.http.services.http-advanced-coffee-machine.loadbalancer.server.port=${WEB_PORT_OUT}
+            - traefik.http.routers.http-advanced-coffee-machine.rule=PathPrefix(`/http-advanced-coffee-machine`)
+            - traefik.http.routers.http-advanced-coffee-machine.entrypoints=web
+            - traefik.http.services.http-advanced-coffee-machine.loadbalancer.server.port=${WEB_PORT_OUT}
         environment:
             - HOSTNAME=0.0.0.0
             - PORT=${WEB_PORT_OUT}

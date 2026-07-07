@@ -29,7 +29,10 @@ let portNumber = process.env.PORT ?? 3001;
 const thingName = "http-express-calculator-content-negotiation";
 const protocol = (process.env.PROTOCOL ?? "https").toLowerCase();
 const defaultExternalPort = protocol === "http" ? 80 : 443;
-const externalPort = process.env.EXTERNAL_PORT != null && process.env.EXTERNAL_PORT !== "" ? parseInt(process.env.EXTERNAL_PORT) : defaultExternalPort;
+const externalPort =
+    process.env.EXTERNAL_PORT != null && process.env.EXTERNAL_PORT !== ""
+        ? parseInt(process.env.EXTERNAL_PORT)
+        : defaultExternalPort;
 const baseUri = externalPort === defaultExternalPort ? `${hostname}` : `${hostname}:${externalPort}`;
 
 const TDEndPoint = `/${thingName}`;
