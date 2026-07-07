@@ -27,6 +27,10 @@ app.use(express.json({ strict: false }));
 const hostname = process.env.HOSTNAME ?? "localhost";
 let portNumber = process.env.PORT ?? 3001;
 const thingName = "http-express-calculator-content-negotiation";
+const protocol = (process.env.PROTOCOL ?? "https").toLowerCase();
+const defaultExternalPort = protocol === "http" ? 80 : 443;
+const externalPort = process.env.EXTERNAL_PORT != null && process.env.EXTERNAL_PORT !== "" ? parseInt(process.env.EXTERNAL_PORT) : defaultExternalPort;
+const baseUri = externalPort === defaultExternalPort ? `${hostname}` : `${hostname}:${externalPort}`;
 
 const TDEndPoint = `/${thingName}`;
 const resultEndPoint = `/${thingName}/properties/result`;
@@ -76,9 +80,9 @@ const thingModel = JSON.parse(fs.readFileSync(path.join(__dirname, tmPath)));
 
 const placeholderReplacer = new JsonPlaceholderReplacer();
 placeholderReplacer.addVariableMap({
-    PROTOCOL: "http",
+    PROTOCOL: protocol,
     THING_NAME: thingName,
-    HOSTNAME: hostname,
+    HOSTNAME: baseUri,
     PORT_NUMBER: portNumber,
     RESULT_OBSERVABLE: true,
     LAST_CHANGE_OBSERVABLE: true,

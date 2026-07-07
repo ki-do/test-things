@@ -43,10 +43,12 @@ services:
             - traefik.http.routers.http-express-calculator-simple-secure.rule=PathPrefix(`/http-express-calculator-simple`)
             - traefik.http.routers.http-express-calculator-simple-secure.entrypoints=websecure
             - traefik.http.routers.http-express-calculator-simple-secure.tls=true
-            - traefik.http.services.http-express-calculator-simple.loadbalancer.server.port=${WEB_PORT_OUT}
+            - traefik.http.services.http-express-calculator-simple.loadbalancer.server.port=${SECURE_WEB_PORT_OUT}
         environment:
             - HOSTNAME=${STACK_HOSTNAME}
-            - PORT=${WEB_PORT_OUT}
+            - PORT=${SECURE_WEB_PORT_OUT}
+            - EXTERNAL_PORT=${SECURE_WEB_PORT_OUT}
+            - PROTOCOL=https
             - LOKI_HOSTNAME=${LOKI_HOSTNAME}
             - LOKI_PORT=${LOKI_PORT}
         deploy:
@@ -58,7 +60,7 @@ services:
                     cpus: "0.01"
                     memory: 25M
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-express-calculator-simple || exit 1
+            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-express-calculator-simple || exit 1
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -69,10 +71,12 @@ services:
         image: thingweb/test-things-http-express-calculator-content-negotiation
         labels:
             - traefik.http.routers.http-express-calculator-content-negotiation.rule=PathPrefix(`/http-express-calculator-content-negotiation`)
-            - traefik.http.services.http-express-calculator-content-negotiation.loadbalancer.server.port=${WEB_PORT_OUT}
+            - traefik.http.services.http-express-calculator-content-negotiation.loadbalancer.server.port=${SECURE_WEB_PORT_OUT}
         environment:
             - HOSTNAME=${STACK_HOSTNAME}
-            - PORT=${WEB_PORT_OUT}
+            - PORT=${SECURE_WEB_PORT_OUT}
+            - EXTERNAL_PORT=${SECURE_WEB_PORT_OUT}
+            - PROTOCOL=https
         deploy:
             resources:
                 limits:
@@ -82,7 +86,7 @@ services:
                     cpus: "0.01"
                     memory: 25M
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-express-calculator-content-negotiation || exit 1
+            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-express-calculator-content-negotiation || exit 1
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -93,10 +97,12 @@ services:
         image: thingweb/test-things-flask-calculator
         labels:
             - traefik.http.routers.http-flask-calculator.rule=PathPrefix(`/http-flask-calculator`)
-            - traefik.http.services.http-flask-calculator.loadbalancer.server.port=${WEB_PORT_OUT}
+            - traefik.http.services.http-flask-calculator.loadbalancer.server.port=${SECURE_WEB_PORT_OUT}
         environment:
             - HOSTNAME=${STACK_HOSTNAME}
-            - PORT=${WEB_PORT_OUT}
+            - PORT=${SECURE_WEB_PORT_OUT}
+            - EXTERNAL_PORT=${SECURE_WEB_PORT_OUT}
+            - PROTOCOL=https
         deploy:
             resources:
                 limits:
@@ -106,7 +112,7 @@ services:
                     cpus: "0.01"
                     memory: 25M
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-flask-calculator || exit 1
+            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-flask-calculator || exit 1
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -153,10 +159,12 @@ services:
             - traefik.http.routers.http-advanced-coffee-machine-secure.rule=PathPrefix(`/http-advanced-coffee-machine`)
             - traefik.http.routers.http-advanced-coffee-machine-secure.entrypoints=websecure
             - traefik.http.routers.http-advanced-coffee-machine-secure.tls=true
-            - traefik.http.services.http-advanced-coffee-machine.loadbalancer.server.port=${WEB_PORT_OUT}
+            - traefik.http.services.http-advanced-coffee-machine.loadbalancer.server.port=${SECURE_WEB_PORT_OUT}
         environment:
             - HOSTNAME=${STACK_HOSTNAME}
-            - PORT=${WEB_PORT_OUT}
+            - PORT=${SECURE_WEB_PORT_OUT}
+            - EXTERNAL_PORT=${SECURE_WEB_PORT_OUT}
+            - PROTOCOL=https
             - JAEGER_ENDPOINT=${JAEGER_ENDPOINT}
         deploy:
             resources:
@@ -176,10 +184,12 @@ services:
             - traefik.http.routers.http-data-schema-thing-secure.rule=PathPrefix(`/http-data-schema-thing`)
             - traefik.http.routers.http-data-schema-thing-secure.entrypoints=websecure
             - traefik.http.routers.http-data-schema-thing-secure.tls=true
-            - traefik.http.services.http-data-schema-thing.loadbalancer.server.port=${WEB_PORT_OUT}
+            - traefik.http.services.http-data-schema-thing.loadbalancer.server.port=${SECURE_WEB_PORT_OUT}
         environment:
             - HOSTNAME=${STACK_HOSTNAME}
-            - PORT=${WEB_PORT_OUT}
+            - PORT=${SECURE_WEB_PORT_OUT}
+            - EXTERNAL_PORT=${SECURE_WEB_PORT_OUT}
+            - PROTOCOL=https
             - LOKI_HOSTNAME=${LOKI_HOSTNAME}
             - LOKI_PORT=${LOKI_PORT}
         deploy:
@@ -196,10 +206,16 @@ services:
         image: thingweb/test-things-counter-thing
         labels:
             - traefik.http.routers.counter-thing.rule=PathPrefix(`/counter-thing`)
-            - traefik.http.services.counter-thing.loadbalancer.server.port=${WEB_PORT_OUT}
+            - traefik.http.routers.counter-thing.entrypoints=web
+            - traefik.http.routers.counter-thing-secure.rule=PathPrefix(`/counter-thing`)
+            - traefik.http.routers.counter-thing-secure.entrypoints=websecure
+            - traefik.http.routers.counter-thing-secure.tls=true
+            - traefik.http.services.counter-thing.loadbalancer.server.port=${SECURE_WEB_PORT_OUT}
         environment:
             - HOSTNAME=${STACK_HOSTNAME}
-            - PORT=${WEB_PORT_OUT}
+            - PORT=${SECURE_WEB_PORT_OUT}
+            - EXTERNAL_PORT=${SECURE_WEB_PORT_OUT}
+            - PROTOCOL=https
             - LOKI_HOSTNAME=${LOKI_HOSTNAME}
             - LOKI_PORT=${LOKI_PORT}
         deploy:
@@ -229,13 +245,13 @@ services:
         labels:
             # TD is not exposed since it contains hostname that cannot be accessed outside the docker network
             - traefik.http.routers.smart-home-simple-coffee-machine.rule=PathRegexp(`/smart-home-simple-coffee-machine/.+`)
-            - traefik.http.services.smart-home-simple-coffee-machine.loadbalancer.server.port=${WEB_PORT_OUT}
+            - traefik.http.services.smart-home-simple-coffee-machine.loadbalancer.server.port=${SECURE_WEB_PORT_OUT}
         environment:
             # Since mashup communicates inside the Docker network use of localhost in a TD result as
             # the mashup container's its own localhost. Therefore hostname given as their docker service name.
             # In production we will have a dedicated address and this issue won't be a problem.
             - SIMPLE_COFFEE_MACHINE_HOSTNAME=smart-home-simple-coffee-machine
-            - PORT=${WEB_PORT_OUT}
+            - PORT=${SECURE_WEB_PORT_OUT}
         deploy:
             resources:
                 limits:

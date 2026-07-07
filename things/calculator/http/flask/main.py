@@ -22,8 +22,10 @@ cli = sys.modules['flask.cli']
 
 cli.show_server_banner = lambda *x: click.echo("ThingIsReady")
 
-hostname = "0.0.0.0"
+bind_hostname = "0.0.0.0"
+advertised_hostname = "0.0.0.0"
 portNumber = 5000
+protocol = os.getenv("PROTOCOL", "https").lower()
 
 if "HOSTNAME" in os.environ:
     hostname = os.environ["HOSTNAME"]
@@ -43,7 +45,7 @@ with open(tmPath) as infile:
 
 thingModel["@type"] = 'Thing'
 thingModel = json.dumps(thingModel)
-thingModel = thingModel.replace('{{PROTOCOL}}', 'http')
+thingModel = thingModel.replace('{{PROTOCOL}}', protocol)
 thingModel = thingModel.replace('{{HOSTNAME}}', hostname)
 thingModel = thingModel.replace('{{PROPERTIES}}', PROPERTIES)
 thingModel = thingModel.replace('{{ACTIONS}}', ACTIONS)
