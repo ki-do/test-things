@@ -18,17 +18,25 @@ app = Flask(__name__)
 log = logging.getLogger('werkzeug')
 log.disabled = True
 
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Accept, Authorization"
+    return response
+
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        return ("", 204)
+
 cli = sys.modules['flask.cli']
 
 cli.show_server_banner = lambda *x: click.echo("ThingIsReady")
 
-bind_hostname = "0.0.0.0"
-advertised_hostname = "0.0.0.0"
 portNumber = 5000
 protocol = os.getenv("PROTOCOL", "https").lower()
-
-if "HOSTNAME" in os.environ:
-    hostname = os.environ["HOSTNAME"]
+hostname = os.getenv("HOSTNAME", "0.0.0.0")
 
 if "PORT" in os.environ:
     portNumber = os.environ["PORT"]
@@ -160,4 +168,4 @@ else:
     port = 5000
 
 if __name__ == "__main__":
-    app.run(debug=False, host=hostname, port=port)
+    app.run(debug=False, host="0.0.0.0", port=port)
