@@ -51,16 +51,17 @@ services:
             - PROTOCOL=https
             - LOKI_HOSTNAME=${LOKI_HOSTNAME}
             - LOKI_PORT=${LOKI_PORT}
+            - LOKI_PROTOCOL=http
         deploy:
             resources:
                 limits:
                     cpus: "0.05"
-                    memory: 50M
+                    memory: 256M
                 reservations:
                     cpus: "0.01"
-                    memory: 25M
+                    memory: 128M
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-express-calculator-simple || exit 1
+            test: wget --no-verbose --tries=1 --spider https://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-express-calculator-simple || exit 1
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -71,6 +72,10 @@ services:
         image: thingweb/test-things-http-express-calculator-content-negotiation
         labels:
             - traefik.http.routers.http-express-calculator-content-negotiation.rule=PathPrefix(`/http-express-calculator-content-negotiation`)
+            - traefik.http.routers.http-express-calculator-content-negotiation.entrypoints=web
+            - traefik.http.routers.http-express-calculator-content-negotiation-secure.rule=PathPrefix(`/http-express-calculator-content-negotiation`)
+            - traefik.http.routers.http-express-calculator-content-negotiation-secure.entrypoints=websecure
+            - traefik.http.routers.http-express-calculator-content-negotiation-secure.tls=true
             - traefik.http.services.http-express-calculator-content-negotiation.loadbalancer.server.port=${SECURE_WEB_PORT_OUT}
         environment:
             - HOSTNAME=${STACK_HOSTNAME}
@@ -81,12 +86,12 @@ services:
             resources:
                 limits:
                     cpus: "0.05"
-                    memory: 50M
+                    memory: 256M
                 reservations:
                     cpus: "0.01"
-                    memory: 25M
+                    memory: 128M
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-express-calculator-content-negotiation || exit 1
+            test: wget --no-verbose --tries=1 --spider https://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-express-calculator-content-negotiation || exit 1
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -97,6 +102,10 @@ services:
         image: thingweb/test-things-flask-calculator
         labels:
             - traefik.http.routers.http-flask-calculator.rule=PathPrefix(`/http-flask-calculator`)
+            - traefik.http.routers.http-flask-calculator.entrypoints=web
+            - traefik.http.routers.http-flask-calculator-secure.rule=PathPrefix(`/http-flask-calculator`)
+            - traefik.http.routers.http-flask-calculator-secure.entrypoints=websecure
+            - traefik.http.routers.http-flask-calculator-secure.tls=true
             - traefik.http.services.http-flask-calculator.loadbalancer.server.port=${SECURE_WEB_PORT_OUT}
         environment:
             - HOSTNAME=${STACK_HOSTNAME}
@@ -107,12 +116,12 @@ services:
             resources:
                 limits:
                     cpus: "0.05"
-                    memory: 50M
+                    memory: 256M
                 reservations:
                     cpus: "0.01"
-                    memory: 25M
+                    memory: 128M
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-flask-calculator || exit 1
+            test: wget --no-verbose --tries=1 --spider https://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-flask-calculator || exit 1
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -170,10 +179,10 @@ services:
             resources:
                 limits:
                     cpus: "0.05"
-                    memory: 50M
+                    memory: 256M
                 reservations:
                     cpus: "0.01"
-                    memory: 25M
+                    memory: 128M
         networks:
             - things_network
     http-data-schema-thing:
@@ -196,18 +205,19 @@ services:
             resources:
                 limits:
                     cpus: "0.05"
-                    memory: 50M
+                    memory: 256M
                 reservations:
                     cpus: "0.01"
-                    memory: 25M
+                    memory: 128M
         networks:
             - things_network
     counter-thing:
-        image: thingweb/test-things-counter-thing
+        image: thingweb/test-things-counter
         labels:
-            - traefik.http.routers.counter-thing.rule=PathPrefix(`/counter-thing`)
+            - traefik.http.routers.counter-thing.rule=Host(`${STACK_HOSTNAME}`) && PathPrefix(`/counter`)
             - traefik.http.routers.counter-thing.entrypoints=web
-            - traefik.http.routers.counter-thing-secure.rule=PathPrefix(`/counter-thing`)
+            - traefik.http.routers.counter-thing.priority=100
+            - traefik.http.routers.counter-thing-secure.rule=Host(`${STACK_HOSTNAME}`) && PathPrefix(`/counter`)
             - traefik.http.routers.counter-thing-secure.entrypoints=websecure
             - traefik.http.routers.counter-thing-secure.tls=true
             - traefik.http.services.counter-thing.loadbalancer.server.port=${SECURE_WEB_PORT_OUT}
@@ -222,10 +232,10 @@ services:
             resources:
                 limits:
                     cpus: "0.05"
-                    memory: 50M
+                    memory: 256M
                 reservations:
                     cpus: "0.01"
-                    memory: 25M
+                    memory: 128M
         networks:
             - things_network
     smart-home-presence-sensor:
@@ -234,10 +244,10 @@ services:
             resources:
                 limits:
                     cpus: "0.05"
-                    memory: 50M
+                    memory: 256M
                 reservations:
                     cpus: "0.01"
-                    memory: 25M
+                    memory: 128M
         networks:
             - things_network
     smart-home-simple-coffee-machine:
@@ -256,10 +266,10 @@ services:
             resources:
                 limits:
                     cpus: "0.05"
-                    memory: 50M
+                    memory: 256M
                 reservations:
                     cpus: "0.01"
-                    memory: 25M
+                    memory: 128M
         networks:
             - things_network
     smart-home-smart-clock:
@@ -299,10 +309,10 @@ services:
             resources:
                 limits:
                     cpus: "0.05"
-                    memory: 50M
+                    memory: 256M
                 reservations:
                     cpus: "0.01"
-                    memory: 25M
+                    memory: 128M
         networks:
             - things_network
 
