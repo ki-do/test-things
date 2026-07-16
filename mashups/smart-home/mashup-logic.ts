@@ -34,14 +34,14 @@ const wotHelper = new Helpers(servient);
 
     const coffeeMachineURL =
         process.env.SIMPLE_COFFEE_MACHINE_HOSTNAME === "smart-home-simple-coffee-machine"
-            ? `http://${process.env.SIMPLE_COFFEE_MACHINE_HOSTNAME}/smart-home-simple-coffee-machine`
-            : `http://${process.env.SIMPLE_COFFEE_MACHINE_HOSTNAME}:${process.env.SIMPLE_COFFEE_MACHINE_PORT}/smart-home-simple-coffee-machine`;
+            ? `https://${process.env.SIMPLE_COFFEE_MACHINE_HOSTNAME}/smart-home-simple-coffee-machine`
+            : `https://${process.env.SIMPLE_COFFEE_MACHINE_HOSTNAME}:${process.env.SIMPLE_COFFEE_MACHINE_PORT}/smart-home-simple-coffee-machine`;
 
     // we will fetch the TDs of the devices
     const coffeeMachineTD = (await wotHelper.fetch(coffeeMachineURL)) as WoT.ThingDescription;
     // Alternatively, this Thing self-hosts its TD at http://plugfest.thingweb.io:8081/coffee-machine that you can fetch
     const presenceSensorTD = (await wotHelper.fetch(
-        `mqtt://${process.env.PRESENCE_SENSOR_BROKER_URI}/smart-home-presence-sensor`
+        `mqtt://${process.env.PRESENCE_SENSOR_BROKER_URI}:8087/smart-home-presence-sensor`
     )) as WoT.ThingDescription;
     const smartClockTD = (await wotHelper.fetch(
         `coap://${process.env.SMART_CLOCK_HOSTNAME}:${process.env.SMART_CLOCK_PORT}/smart-home-smart-clock`

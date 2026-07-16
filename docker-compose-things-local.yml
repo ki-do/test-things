@@ -177,6 +177,7 @@ services:
             # the mashup container's its own localhost. Therefore hostname given as their docker service name.
             # In production we will have a dedicated address and this issue won't be a problem.
             - SIMPLE_COFFEE_MACHINE_HOSTNAME=smart-home-simple-coffee-machine
+            - SIMPLE_COFFEE_MACHINE_PORT=${WEB_PORT_OUT}
             - PORT=${WEB_PORT_OUT}
         networks:
             - things_network_local
@@ -201,7 +202,9 @@ services:
             dockerfile: ./dockerfiles/mashup.Dockerfile
         environment:
             - SIMPLE_COFFEE_MACHINE_HOSTNAME=smart-home-simple-coffee-machine
+            - SIMPLE_COFFEE_MACHINE_PORT=${WEB_PORT_OUT}
             - PRESENCE_SENSOR_BROKER_URI=${BROKER_URI}
+            - PRESENCE_SENSOR_PORT=${BROKER_PORT}
             - SMART_CLOCK_HOSTNAME=smart-home-smart-clock
             - SMART_CLOCK_PORT=${SMART_HOME_SMART_CLOCK_PORT_OUT}
         depends_on:

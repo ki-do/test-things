@@ -24,7 +24,7 @@ const { createLogger, transports, format } = require("winston");
 const LokiTransport = require("winston-loki");
 
 const brokerURI = process.env.BROKER_URI ?? "test.mosquitto.org";
-let portNumber = process.env.PORT ?? 1883;
+let portNumber = process.env.PORT ?? 8087;
 
 const {
     values: { port },
