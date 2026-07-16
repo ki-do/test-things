@@ -7,7 +7,7 @@ services:
             - traefik.udp.routers.coap-calculator-simple.entrypoints=coap-calculator-simple
             - traefik.udp.services.coap-calculator-simple.loadbalancer.server.port=${COAP_SIMPLE_PORT_OUT}
         environment:
-            - HOSTNAME=0.0.0.0
+            - HOSTNAME=${STACK_HOSTNAME}
             - PORT=${COAP_SIMPLE_PORT_OUT}
         networks:
             - things_network_local
@@ -19,7 +19,7 @@ services:
             - traefik.udp.routers.coap-calculator-content-negotiation.entrypoints=coap-calculator-content-negotiation
             - traefik.udp.services.coap-calculator-simple.loadbalancer.server.port=${COAP_NEGOTIATION_PORT_OUT}
         environment:
-            - HOSTNAME=0.0.0.0
+            - HOSTNAME=${STACK_HOSTNAME}
             - PORT=${COAP_NEGOTIATION_PORT_OUT}
         networks:
             - things_network_local
@@ -32,7 +32,7 @@ services:
             - traefik.http.routers.http-express-calculator-simple.entrypoints=web
             - traefik.http.services.http-express-calculator-simple.loadbalancer.server.port=${WEB_PORT_OUT}
         environment:
-            - HOSTNAME=0.0.0.0
+            - HOSTNAME=${STACK_HOSTNAME}
             - PORT=${WEB_PORT_OUT}
             - EXTERNAL_PORT=${WEB_PORT_OUT}
             - PROTOCOL=http
@@ -55,7 +55,7 @@ services:
             - traefik.http.routers.http-express-calculator-content-negotiation.entrypoints=web
             - traefik.http.services.http-express-calculator-content-negotiation.loadbalancer.server.port=${WEB_PORT_OUT}
         environment:
-            - HOSTNAME=0.0.0.0
+            - HOSTNAME=${STACK_HOSTNAME}
             - PORT=${WEB_PORT_OUT}
             - EXTERNAL_PORT=${WEB_PORT_OUT}
             - PROTOCOL=http
@@ -76,7 +76,7 @@ services:
             - traefik.http.routers.http-flask-calculator.entrypoints=web
             - traefik.http.services.http-flask-calculator.loadbalancer.server.port=${WEB_PORT_OUT}
         environment:
-            - HOSTNAME=0.0.0.0
+            - HOSTNAME=${STACK_HOSTNAME}
             - PORT=${WEB_PORT_OUT}
             - EXTERNAL_PORT=${WEB_PORT_OUT}
             - PROTOCOL=http
@@ -117,7 +117,7 @@ services:
             - traefik.http.routers.http-advanced-coffee-machine.entrypoints=web
             - traefik.http.services.http-advanced-coffee-machine.loadbalancer.server.port=${WEB_PORT_OUT}
         environment:
-            - HOSTNAME=0.0.0.0
+            - HOSTNAME=${STACK_HOSTNAME}
             - PORT=${WEB_PORT_OUT}
             - EXTERNAL_PORT=${WEB_PORT_OUT}
             - PROTOCOL=http
@@ -133,7 +133,7 @@ services:
             - traefik.http.routers.http-data-schema-thing.entrypoints=web
             - traefik.http.services.http-data-schema-thing.loadbalancer.server.port=${WEB_PORT_OUT}
         environment:
-            - HOSTNAME=0.0.0.0
+            - HOSTNAME=${STACK_HOSTNAME}
             - PORT=${WEB_PORT_OUT}
             - EXTERNAL_PORT=${WEB_PORT_OUT}
             - PROTOCOL=http
@@ -150,7 +150,7 @@ services:
             - traefik.http.routers.counter-thing.entrypoints=web
             - traefik.http.services.counter-thing.loadbalancer.server.port=${WEB_PORT_OUT}
         environment:
-            - HOSTNAME=0.0.0.0
+            - HOSTNAME=${STACK_HOSTNAME}
             - PORT=${WEB_PORT_OUT}
             - EXTERNAL_PORT=${WEB_PORT_OUT}
             - PROTOCOL=http
@@ -162,8 +162,11 @@ services:
         build:
             context: ./mashups/smart-home
             dockerfile: ./dockerfiles/presence-sensor.Dockerfile
+        environment:
+            - PRESENCE_SENSOR_BROKER_URI=${BROKER_URI}
+            - PRESENCE_SENSOR_BROKER_PORT=${BROKER_PORT}
         networks:
-            - things_network_local
+            - things_network_local    
     smart-home-simple-coffee-machine:
         build:
             context: ./mashups/smart-home
@@ -201,8 +204,9 @@ services:
             context: ./mashups/smart-home
             dockerfile: ./dockerfiles/mashup.Dockerfile
         environment:
-            - SIMPLE_COFFEE_MACHINE_HOSTNAME=smart-home-simple-coffee-machine
+            - SIMPLE_COFFEE_MACHINE_HOSTNAME=http://smart-home-simple-coffee-machine
             - SIMPLE_COFFEE_MACHINE_PORT=${WEB_PORT_OUT}
+            - SIMPLE_COFFEE_MACHINE_PATH=smart-home-simple-coffee-machine
             - PRESENCE_SENSOR_BROKER_URI=${BROKER_URI}
             - PRESENCE_SENSOR_PORT=${BROKER_PORT}
             - SMART_CLOCK_HOSTNAME=smart-home-smart-clock

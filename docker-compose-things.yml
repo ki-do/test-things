@@ -60,7 +60,7 @@ services:
                 limits:
                     cpus: "0.05"
                     memory: 256M
-                    pids: 200
+                    pids: 250
                 reservations:
                     cpus: "0.01"
                     memory: 128M
@@ -92,7 +92,7 @@ services:
                 limits:
                     cpus: "0.05"
                     memory: 256M
-                    pids: 200
+                    pids: 250
                 reservations:
                     cpus: "0.01"
                     memory: 128M
@@ -253,6 +253,9 @@ services:
     smart-home-presence-sensor:
         image: thingweb/test-things-smart-home-presence-sensor
         restart: on-failure
+        environment:
+            - PRESENCE_SENSOR_BROKER_URI=${BROKER_URI}
+            - PRESENCE_SENSOR_BROKER_PORT=${BROKER_PORT}
         deploy:
             resources:
                 limits:
@@ -315,8 +318,9 @@ services:
     smart-home-mashup:
         image: thingweb/test-things-smart-home-main
         environment:
-            - SIMPLE_COFFEE_MACHINE_HOSTNAME=${STACK_HOSTNAME}
+            - SIMPLE_COFFEE_MACHINE_HOSTNAME=https://${STACK_HOSTNAME}
             - SIMPLE_COFFEE_MACHINE_PORT=${SECURE_WEB_PORT_OUT}
+            - SIMPLE_COFFEE_MACHINE_PATH=smart-home-simple-coffee-machine
             - PRESENCE_SENSOR_BROKER_URI=${BROKER_URI}
             - PRESENCE_SENSOR_PORT=${BROKER_PORT}
             - SMART_CLOCK_HOSTNAME=smart-home-smart-clock
