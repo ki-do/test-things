@@ -22,7 +22,7 @@ services:
         image: thingweb/test-things-coap-calculator-content-negotiation
         labels:
             - traefik.udp.routers.coap-calculator-content-negotiation.entrypoints=coap-calculator-content-negotiation
-            - traefik.udp.services.coap-calculator-simple.loadbalancer.server.port=${COAP_NEGOTIATION_PORT_OUT}
+            - traefik.udp.services.coap-calculator-content-negotiation.loadbalancer.server.port=${COAP_NEGOTIATION_PORT_OUT}
         environment:
             - HOSTNAME=${STACK_HOSTNAME}
             - PORT=${COAP_NEGOTIATION_PORT_OUT}
@@ -65,7 +65,7 @@ services:
                     cpus: "0.01"
                     memory: 128M
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider https://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-express-calculator-simple || exit 1
+            test: wget --no-verbose --tries=1 --spider https://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-express-calculator-simple
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -97,7 +97,7 @@ services:
                     cpus: "0.01"
                     memory: 128M
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider https://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-express-calculator-content-negotiation || exit 1
+            test: wget --no-verbose --tries=1 --spider https://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-express-calculator-content-negotiation
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -128,7 +128,7 @@ services:
                     cpus: "0.01"
                     memory: 128M
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider https://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-flask-calculator || exit 1
+            test: wget --no-verbose --tries=1 --spider https://${STACK_HOSTNAME}:${SECURE_WEB_PORT_OUT}/http-flask-calculator
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -280,8 +280,9 @@ services:
             # Since mashup communicates inside the Docker network use of localhost in a TD result as
             # the mashup container's its own localhost. Therefore hostname given as their docker service name.
             # In production we will have a dedicated address and this issue won't be a problem.
-            - SIMPLE_COFFEE_MACHINE_HOSTNAME=smart-home-simple-coffee-machine
-            - PORT=${SECURE_WEB_PORT_OUT}
+            - SIMPLE_COFFEE_MACHINE_PROTOCOL=https
+            - SIMPLE_COFFEE_MACHINE_HOSTNAME=${STACK_HOSTNAME}
+            - SIMPLE_COFFEE_MACHINE_PORT=${SECURE_WEB_PORT_OUT}
         restart: on-failure
         deploy:
             resources:
@@ -303,7 +304,7 @@ services:
             # the mashup container's its own localhost. Therefore hostname given as their docker service name.
             # In production we will have a dedicated address and this issue won't be a problem.
             - SMART_CLOCK_HOSTNAME=smart-home-smart-clock
-            - PORT=${SMART_HOME_SMART_CLOCK_PORT_OUT}
+            - SMART_CLOCK_PORT=${SMART_HOME_SMART_CLOCK_PORT_OUT}
         restart: on-failure
         deploy:
             resources:
@@ -318,9 +319,10 @@ services:
     smart-home-mashup:
         image: thingweb/test-things-smart-home-main
         environment:
-            - SIMPLE_COFFEE_MACHINE_HOSTNAME=https://${STACK_HOSTNAME}
-            - SIMPLE_COFFEE_MACHINE_PORT=${SECURE_WEB_PORT_OUT}
+            - SIMPLE_COFFEE_MACHINE_PROTOCOL=https
+            - SIMPLE_COFFEE_MACHINE_HOSTNAME=${STACK_HOSTNAME}
             - SIMPLE_COFFEE_MACHINE_PATH=smart-home-simple-coffee-machine
+            - SIMPLE_COFFEE_MACHINE_PORT=${SECURE_WEB_PORT_OUT}
             - PRESENCE_SENSOR_BROKER_URI=${BROKER_URI}
             - PRESENCE_SENSOR_PORT=${BROKER_PORT}
             - SMART_CLOCK_HOSTNAME=smart-home-smart-clock

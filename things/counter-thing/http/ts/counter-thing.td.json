@@ -3,7 +3,7 @@
     "title": "Counter",
     "description": "Counter example Thing",
     "support": "https://github.com/eclipse-thingweb/node-wot/",
-    "base": "https://localhost:3000/counter/",
+    "base": "https://plugfest.thingweb.io:3000/counter/",
     "links": [
         {
             "href": "https://www.thingweb.io/img/favicon/favicon.png",

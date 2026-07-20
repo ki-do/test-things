@@ -32,10 +32,7 @@ const wotHelper = new Helpers(servient);
 (async () => {
     const WoT = await servient.start();
 
-    const coffeeMachineURL =
-        process.env.SIMPLE_COFFEE_MACHINE_HOSTNAME?.includes("smart-home-simple-coffee-machine")
-            ? `${process.env.SIMPLE_COFFEE_MACHINE_HOSTNAME}/${process.env.SIMPLE_COFFEE_MACHINE_PATH}`
-            : `${process.env.SIMPLE_COFFEE_MACHINE_HOSTNAME}:${process.env.SIMPLE_COFFEE_MACHINE_PORT}/${process.env.SIMPLE_COFFEE_MACHINE_PATH}`;
+    const coffeeMachineURL = `${process.env.SIMPLE_COFFEE_MACHINE_PROTOCOL}://${process.env.SIMPLE_COFFEE_MACHINE_HOSTNAME}:${process.env.SIMPLE_COFFEE_MACHINE_PORT}/${process.env.SIMPLE_COFFEE_MACHINE_PATH}`;
 
     // we will fetch the TDs of the devices
     const coffeeMachineTD = (await wotHelper.fetch(coffeeMachineURL)) as WoT.ThingDescription;
@@ -53,6 +50,7 @@ const wotHelper = new Helpers(servient);
     const smartClockThing = await WoT.consume(smartClockTD);
 
     let morningCoffeeFlag = false;
+    let brewInProgress = false;
 
     // We subscribe to the presence detection events
     presenceSensorThing.subscribeEvent("presenceDetected", async (eventData) => {
@@ -78,23 +76,29 @@ const wotHelper = new Helpers(servient);
         );
 
         // To avoid accidental brews, a flag is used to check whether a coffee was brewed before
-        if (!morningCoffeeFlag) {
+        if (!morningCoffeeFlag && !brewInProgress) {
             // As the task indicates, we brew only between 5:00 and 13:00
             if (currentTime.hour <= 13 && currentTime.hour >= 5) {
-                // To brew a coffee, we invoke the brew action in the coffee machine
-                await coffeeMachineThing.invokeAction("brew", "espresso");
-                // We log to indicate to the user that brewing has finished
-                console.log("brewed espresso");
-                // for today we should not brew any more coffee
-                morningCoffeeFlag = true;
+                brewInProgress = true;
+                try {
+                    // To brew a coffee, we invoke the brew action in the coffee machine
+                    await coffeeMachineThing.invokeAction("brew", "espresso");
+                    // We log to indicate to the user that brewing has finished
+                    console.log("brewed espresso");
+                    // for today we should not brew any more coffee
+                    morningCoffeeFlag = true;
+                } catch (error) {
+                    console.error("Coffee order failed:", error);
+                } finally {
+                    brewInProgress = false;
+                }
             }
         }
 
         // we reset the morningCoffeeFlag every day at 1am
-        setInterval(() => {
-            if (currentTime.hour === 1) {
-                morningCoffeeFlag = false;
-            }
-        }, 1000);
+        if (currentTime.hour === 1) {
+            morningCoffeeFlag = false;
+            brewInProgress = false;
+        }
     });
 })();

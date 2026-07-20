@@ -17,7 +17,7 @@
   "security": [
     "nosec_sc"
   ],
-  "base": "https://localhost:3000/http-express-calculator-simple/",
+  "base": "https://plugfest.thingweb.io:3000/http-express-calculator-simple/",
   "properties": {
     "result": {
       "type": "number",

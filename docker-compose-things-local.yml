@@ -17,7 +17,7 @@ services:
             dockerfile: ./coap/js/Dockerfile-contentneg
         labels:
             - traefik.udp.routers.coap-calculator-content-negotiation.entrypoints=coap-calculator-content-negotiation
-            - traefik.udp.services.coap-calculator-simple.loadbalancer.server.port=${COAP_NEGOTIATION_PORT_OUT}
+            - traefik.udp.services.coap-calculator-content-negotiation.loadbalancer.server.port=${COAP_NEGOTIATION_PORT_OUT}
         environment:
             - HOSTNAME=${STACK_HOSTNAME}
             - PORT=${COAP_NEGOTIATION_PORT_OUT}
@@ -39,7 +39,7 @@ services:
             - LOKI_HOSTNAME=${LOKI_HOSTNAME}
             - LOKI_PORT=${LOKI_PORT}
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-express-calculator-simple || exit 1
+            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-express-calculator-simple 
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -60,7 +60,7 @@ services:
             - EXTERNAL_PORT=${WEB_PORT_OUT}
             - PROTOCOL=http
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-express-calculator-content-negotiation || exit 1
+            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-express-calculator-content-negotiation 
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -81,7 +81,7 @@ services:
             - EXTERNAL_PORT=${WEB_PORT_OUT}
             - PROTOCOL=http
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-flask-calculator || exit 1
+            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-flask-calculator 
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -94,6 +94,7 @@ services:
             dockerfile: ./mqtt/js/Dockerfile
         environment:
             - BROKER_URI=${BROKER_URI}
+            - BROKER_PORT=${BROKER_PORT}
             - LOKI_HOSTNAME=${LOKI_HOSTNAME}
             - LOKI_PORT=${LOKI_PORT}
         networks:
@@ -174,14 +175,16 @@ services:
         labels:
             # TD is not exposed since it contains hostname that cannot be accessed outside the docker network
             - traefik.http.routers.smart-home-simple-coffee-machine.rule=PathRegexp(`/smart-home-simple-coffee-machine/.+`)
+            - traefik.http.routers.smart-home-simple-coffee-machine.entrypoints=web
+            - traefik.http.routers.smart-home-simple-coffee-machine-secure.rule=PathPrefix(`/smart-home-simple-coffee-machine`)
             - traefik.http.services.smart-home-simple-coffee-machine.loadbalancer.server.port=${WEB_PORT_OUT}
         environment:
             # Since mashup communicates inside the Docker network use of localhost in a TD result as
             # the mashup container's its own localhost. Therefore hostname given as their docker service name.
             # In production we will have a dedicated address and this issue won't be a problem.
+            - SIMPLE_COFFEE_MACHINE_PROTOCOL=http
             - SIMPLE_COFFEE_MACHINE_HOSTNAME=smart-home-simple-coffee-machine
             - SIMPLE_COFFEE_MACHINE_PORT=${WEB_PORT_OUT}
-            - PORT=${WEB_PORT_OUT}
         networks:
             - things_network_local
     smart-home-smart-clock:
@@ -196,7 +199,7 @@ services:
             # the mashup container's its own localhost. Therefore hostname given as their docker service name.
             # In production we will have a dedicated address and this issue won't be a problem.
             - SMART_CLOCK_HOSTNAME=smart-home-smart-clock
-            - PORT=${SMART_HOME_SMART_CLOCK_PORT_OUT}
+            - SMART_CLOCK_PORT=${SMART_HOME_SMART_CLOCK_PORT_OUT}
         networks:
             - things_network_local
     smart-home-mashup:
@@ -204,7 +207,8 @@ services:
             context: ./mashups/smart-home
             dockerfile: ./dockerfiles/mashup.Dockerfile
         environment:
-            - SIMPLE_COFFEE_MACHINE_HOSTNAME=http://smart-home-simple-coffee-machine
+            - SIMPLE_COFFEE_MACHINE_PROTOCOL=http
+            - SIMPLE_COFFEE_MACHINE_HOSTNAME=smart-home-simple-coffee-machine
             - SIMPLE_COFFEE_MACHINE_PORT=${WEB_PORT_OUT}
             - SIMPLE_COFFEE_MACHINE_PATH=smart-home-simple-coffee-machine
             - PRESENCE_SENSOR_BROKER_URI=${BROKER_URI}
