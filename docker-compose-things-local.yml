@@ -39,7 +39,7 @@ services:
             - LOKI_HOSTNAME=${LOKI_HOSTNAME}
             - LOKI_PORT=${LOKI_PORT}
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-express-calculator-simple 
+            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-express-calculator-simple
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -60,7 +60,7 @@ services:
             - EXTERNAL_PORT=${WEB_PORT_OUT}
             - PROTOCOL=http
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-express-calculator-content-negotiation 
+            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-express-calculator-content-negotiation
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -81,7 +81,7 @@ services:
             - EXTERNAL_PORT=${WEB_PORT_OUT}
             - PROTOCOL=http
         healthcheck:
-            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-flask-calculator 
+            test: wget --no-verbose --tries=1 --spider http://${STACK_HOSTNAME}:${WEB_PORT_OUT}/http-flask-calculator
             interval: ${HC_INTERVAL}
             timeout: ${HC_TIMEOUT}
             retries: ${HC_RETRIES}
@@ -167,7 +167,7 @@ services:
             - PRESENCE_SENSOR_BROKER_URI=${BROKER_URI}
             - PRESENCE_SENSOR_BROKER_PORT=${BROKER_PORT}
         networks:
-            - things_network_local    
+            - things_network_local
     smart-home-simple-coffee-machine:
         build:
             context: ./mashups/smart-home

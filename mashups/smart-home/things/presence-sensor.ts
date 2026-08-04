@@ -25,9 +25,10 @@ dotenv.config();
 const thingName = "smart-home-presence-sensor";
 // create Servient add MQTT binding with port configuration
 const servient = new Servient();
-const brokerUri = (process.env.PRESENCE_SENSOR_BROKER_URI && process.env.PRESENCE_SENSOR_BROKER_PORT)
-    ? `mqtt://${process.env.PRESENCE_SENSOR_BROKER_URI}:${process.env.PRESENCE_SENSOR_BROKER_PORT}`
-    : "mqtt://test.mosquitto.org";
+const brokerUri =
+    process.env.PRESENCE_SENSOR_BROKER_URI && process.env.PRESENCE_SENSOR_BROKER_PORT
+        ? `mqtt://${process.env.PRESENCE_SENSOR_BROKER_URI}:${process.env.PRESENCE_SENSOR_BROKER_PORT}`
+        : "mqtt://test.mosquitto.org";
 servient.addServer(new MqttBrokerServer({ uri: brokerUri }));
 
 servient.start().then((WoT) => {
