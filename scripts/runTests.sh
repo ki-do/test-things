@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# default to HTTP unless explicitly overridden.
+export PROTOCOL="${PROTOCOL:-http}"
+
 return_value=0
 
 # logic for every tm test directory (tmd)
