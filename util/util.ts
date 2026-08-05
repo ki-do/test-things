@@ -15,7 +15,8 @@
 
 import Ajv, { ValidateFunction } from "ajv";
 import { ChildProcess, spawn } from "node:child_process";
-import * as tdSchema from "wot-thing-description-types";
+import fs from "node:fs";
+import path from "node:path";
 
 export type ThingStartResponse = {
     process?: ChildProcess;
@@ -60,9 +61,13 @@ export const getInitiateMain = (mainCmd: string, cmdArgs: string[]): Promise<Thi
 const ajv = new Ajv({ strict: false, allErrors: true, validateFormats: false });
 
 export const getTDValidate = async (): Promise<ValidateResponse> => {
-    // Use the wot-thing-description-types package instead of fetching from remote URL
+    // Load TD schema JSON from the package files
+    const packageJsonPath = require.resolve("wot-thing-description-types/package.json");
+    const schemaPath = path.join(path.dirname(packageJsonPath), "schema", "td-json-schema-validation.json");
+    const tdSchema = JSON.parse(fs.readFileSync(schemaPath, "utf-8")) as Record<string, unknown>;
+
     return Promise.resolve({
-        validate: ajv.compile(tdSchema as Record<string, unknown>),
+        validate: ajv.compile(tdSchema),
         message: "Success",
     });
 };

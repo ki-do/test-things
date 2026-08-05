@@ -11,7 +11,7 @@ describe("Calculator", () => {
 
     before((done) => {
         https.get(
-            "https://raw.githubusercontent.com/w3c/wot-thing-description/main/validation/tm-json-schema-validation.json",
+            "https://www.w3.org/2022/wot/tm-schema/v1.1",
             function (response) {
                 const body = [];
                 response.on("data", (chunk) => {
