@@ -28,9 +28,28 @@ export type ValidateResponse = {
     message: string;
 };
 
+function getPortFromArgs(cmdArgs: string[]): string | undefined {
+    for (let i = 0; i < cmdArgs.length; i++) {
+        const arg = cmdArgs[i];
+        if ((arg === "-p" || arg === "--port") && i + 1 < cmdArgs.length) {
+            return cmdArgs[i + 1];
+        }
+        if (arg.startsWith("--port=")) {
+            return arg.slice("--port=".length);
+        }
+    }
+    return undefined;
+}
+
 export const getInitiateMain = (mainCmd: string, cmdArgs: string[]): Promise<ThingStartResponse> => {
     return new Promise((resolve, reject) => {
-        const thingProcess = spawn(mainCmd, cmdArgs);
+        const derivedExternalPort = getPortFromArgs(cmdArgs);
+        const thingProcess = spawn(mainCmd, cmdArgs, {
+            env: {
+                ...process.env,
+                EXTERNAL_PORT: process.env.EXTERNAL_PORT ?? derivedExternalPort,
+            },
+        });
 
         // Avoids unsettled promise in case the promise is not settled in a second.
         const timeout = setTimeout(() => {
