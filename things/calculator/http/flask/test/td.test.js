@@ -37,21 +37,18 @@ describe("Calculator HTTP Flask", () => {
         });
 
         const getJSONSchema = new Promise((resolve, reject) => {
-            https.get(
-                "https://raw.githubusercontent.com/w3c/wot-thing-description/main/validation/td-json-schema-validation.json",
-                function (response) {
-                    const body = [];
-                    response.on("data", (chunk) => {
-                        body.push(chunk);
-                    });
+            https.get("https://www.w3.org/2022/wot/td-schema/v1.1", function (response) {
+                const body = [];
+                response.on("data", (chunk) => {
+                    body.push(chunk);
+                });
 
-                    response.on("end", () => {
-                        const tdSchema = JSON.parse(Buffer.concat(body).toString());
-                        validate = ajv.compile(tdSchema);
-                        resolve("Success");
-                    });
-                }
-            );
+                response.on("end", () => {
+                    const tdSchema = JSON.parse(Buffer.concat(body).toString());
+                    validate = ajv.compile(tdSchema);
+                    resolve("Success");
+                });
+            });
         });
 
         await Promise.all([initiateMain, getJSONSchema]).then((data) => {
