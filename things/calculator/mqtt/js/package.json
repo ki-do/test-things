@@ -18,6 +18,7 @@
     "license": "EPL-2.0 OR W3C-20150513",
     "dependencies": {
         "dotenv": "^16.3.1",
+        "duplexify": "^4.1.2",
         "json-placeholder-replacer": "^1.0.35",
         "mqtt": "^4.3.8",
         "yallist": "^4.0.0",

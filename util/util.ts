@@ -48,8 +48,9 @@ export const getInitiateMain = (mainCmd: string, cmdArgs: string[]): Promise<Thi
         const thingProcess = spawn(mainCmd, cmdArgs, {
             env: {
                 ...process.env,
+                HOSTNAME: "127.0.0.1",
+                STACK_HOSTNAME: "127.0.0.1",
                 PROTOCOL: process.env.PROTOCOL ?? "http",
-                HOSTNAME: process.env.HOSTNAME ?? "127.0.0.1",
                 PORT: process.env.PORT ?? derivedPort ?? "80",
                 EXTERNAL_PORT: process.env.EXTERNAL_PORT ?? derivedPort ?? "80",
             },
