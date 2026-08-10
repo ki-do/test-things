@@ -211,7 +211,7 @@ setObject({ id: 123, name: "abc" });
 const servient = new Servient();
 servient.addServer(
     new HttpServer({
-        baseUri: `${protocol}://${hostname}`,
+        baseUri: `${protocol}://${hostname}:${portNumber}`,
         port: portNumber,
     })
 );

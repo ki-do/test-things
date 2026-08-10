@@ -15,7 +15,8 @@
 
 import Ajv, { ValidateFunction } from "ajv";
 import { ChildProcess, spawn } from "node:child_process";
-import * as tdSchema from "wot-thing-description-types";
+import fs from "node:fs";
+import path from "node:path";
 
 export type ThingStartResponse = {
     process?: ChildProcess;
@@ -27,9 +28,32 @@ export type ValidateResponse = {
     message: string;
 };
 
+function getPortFromArgs(cmdArgs: string[]): string | undefined {
+    for (let i = 0; i < cmdArgs.length; i++) {
+        const arg = cmdArgs[i];
+        if ((arg === "-p" || arg === "--port") && i + 1 < cmdArgs.length) {
+            return cmdArgs[i + 1];
+        }
+        if (arg.startsWith("--port=")) {
+            return arg.slice("--port=".length);
+        }
+    }
+    return undefined;
+}
+
 export const getInitiateMain = (mainCmd: string, cmdArgs: string[]): Promise<ThingStartResponse> => {
     return new Promise((resolve, reject) => {
-        const thingProcess = spawn(mainCmd, cmdArgs);
+        const derivedPort = getPortFromArgs(cmdArgs);
+        
+        const thingProcess = spawn(mainCmd, cmdArgs, {
+            env: {
+                ...process.env,
+                PROTOCOL: process.env.PROTOCOL ?? "http",
+                HOSTNAME: process.env.HOSTNAME ?? "127.0.0.1",
+                PORT: process.env.PORT ?? derivedPort ?? "80",
+                EXTERNAL_PORT: process.env.EXTERNAL_PORT ?? derivedPort ?? "80",
+            },
+        });
 
         // Avoids unsettled promise in case the promise is not settled in a second.
         const timeout = setTimeout(() => {
@@ -60,9 +84,13 @@ export const getInitiateMain = (mainCmd: string, cmdArgs: string[]): Promise<Thi
 const ajv = new Ajv({ strict: false, allErrors: true, validateFormats: false });
 
 export const getTDValidate = async (): Promise<ValidateResponse> => {
-    // Use the wot-thing-description-types package instead of fetching from remote URL
+    // Load TD schema JSON from the package files
+    const packageJsonPath = require.resolve("wot-thing-description-types/package.json");
+    const schemaPath = path.join(path.dirname(packageJsonPath), "schema", "td-json-schema-validation.json");
+    const tdSchema = JSON.parse(fs.readFileSync(schemaPath, "utf-8")) as Record<string, unknown>;
+
     return Promise.resolve({
-        validate: ajv.compile(tdSchema as Record<string, unknown>),
+        validate: ajv.compile(tdSchema),
         message: "Success",
     });
 };

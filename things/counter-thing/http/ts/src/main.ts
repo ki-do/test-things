@@ -104,7 +104,7 @@ thingDescription.base = `${protocol}://${baseUri}/${thingName}/`;
 const servient = new Servient();
 servient.addServer(
     new HttpServer({
-        baseUri: `${protocol}://${hostname}`,
+        baseUri: `${protocol}://${hostname}:${portNumber}`,
         port: portNumber,
     })
 );

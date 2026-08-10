@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# default to HTTP unless explicitly overridden.
+export PROTOCOL="${PROTOCOL:-http}"
+export HOSTNAME="${HOSTNAME:-127.0.0.1}"
+export STACK_HOSTNAME="${STACK_HOSTNAME:-127.0.0.1}"
+export WEB_PORT_OUT="${WEB_PORT_OUT:-80}"
+export EXTERNAL_PORT="${EXTERNAL_PORT:-80}"
+
 return_value=0
 
 # logic for every tm test directory (tmd)
