@@ -44,7 +44,7 @@ function getPortFromArgs(cmdArgs: string[]): string | undefined {
 export const getInitiateMain = (mainCmd: string, cmdArgs: string[]): Promise<ThingStartResponse> => {
     return new Promise((resolve, reject) => {
         const derivedPort = getPortFromArgs(cmdArgs);
-        
+
         const thingProcess = spawn(mainCmd, cmdArgs, {
             env: {
                 ...process.env,
