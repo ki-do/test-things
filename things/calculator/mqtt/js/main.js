@@ -23,7 +23,7 @@ require("dotenv").config();
 const { createLogger, transports, format } = require("winston");
 const LokiTransport = require("winston-loki");
 
-const brokerURI = process.env.BROKER_URI ?? "test.mosquitto.org";
+const brokerURI = process.env.BROKER_URI ?? "plugfest.thingweb.io";
 let portNumber = process.env.PORT ?? 8087;
 
 const {
@@ -151,6 +151,13 @@ broker.on("connect", () => {
 
     broker.publish(`${thingName}`, JSON.stringify(thingDescription), { retain: true }, () => {
         console.log("ThingIsReady");
+    });
+});
+
+broker.on("error", (error) => {
+    console.log(`Cannot connect to broker mqtt://${brokerURI}:${portNumber} - ${error.message}`);
+    broker.end(true, {}, () => {
+        process.exit(1);
     });
 });
 

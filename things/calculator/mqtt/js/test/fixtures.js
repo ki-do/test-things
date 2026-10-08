@@ -19,8 +19,8 @@ require("dotenv").config();
 
 let thingProcess;
 let response;
-const port = Number(process.env.BROKER_PORT ?? 1883);
-const brokerURI = process.env.BROKER_URI ?? "localhost";
+const port = Number(process.env.BROKER_PORT ?? 8087);
+const brokerURI = process.env.BROKER_URI ?? "plugfest.thingweb.io";
 
 exports.mochaGlobalSetup = async function () {
     try {

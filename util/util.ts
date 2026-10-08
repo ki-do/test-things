@@ -45,33 +45,34 @@ export const getInitiateMain = (mainCmd: string, cmdArgs: string[]): Promise<Thi
     return new Promise((resolve, reject) => {
         const thingProcess = spawn(mainCmd, cmdArgs);
         let settled = false;
+        let stderr = "";
+        const timerRef: { timeout?: NodeJS.Timeout } = {};
+
+        const settleReject = (err: Error) => {
+            if (settled) return;
+            settled = true;
+            if (timerRef.timeout) clearTimeout(timerRef.timeout);
+            reject(err);
+        };
+        thingProcess.stderr?.on("data", (data) => {
+            stderr += data.toString();
+        });
+        // Give things enough time to initialize transports and announce readiness.
+        const startTimeout = Number(process.env.THING_START_TIMEOUT ?? 60000);
+
+        timerRef.timeout = setTimeout(() => {
+            thingProcess.kill();
+            settleReject(new Error(`Thing did not start as expected.${stderr ? `\n${stderr}` : ""}`));
+        }, startTimeout);
 
         const settleResolve = (result: ThingStartResponse) => {
             if (settled) {
                 return;
             }
             settled = true;
-            clearTimeout(timeout);
+            if (timerRef.timeout) clearTimeout(timerRef.timeout);
             resolve(result);
         };
-
-        const settleReject = (error: Error) => {
-            if (settled) {
-                return;
-            }
-            settled = true;
-            clearTimeout(timeout);
-            reject(error);
-        };
-
-        // Give things enough time to initialize transports and announce readiness.
-        const startTimeout = Number(process.env.THING_START_TIMEOUT ?? 60000);
-        const timeout = setTimeout(() => {
-            thingProcess.kill();
-            settleReject(new Error(`Thing did not start as expected.${stderr ? `\n${stderr}` : ""}`));
-        }, startTimeout);
-
-        let stderr = "";
 
         thingProcess.stdout!.on("data", (data: Buffer) => {
             if (data.toString().includes("ThingIsReady")) {
@@ -81,14 +82,11 @@ export const getInitiateMain = (mainCmd: string, cmdArgs: string[]): Promise<Thi
                 });
             }
         });
-        thingProcess.stderr!.on("data", (data: Buffer) => {
-            settleReject(new Error(`Process stderr: ${data}`));
-        });
         thingProcess.on("error", (error: Error) => {
             settleReject(new Error(`Process error: ${error.message}`));
         });
         thingProcess.on("close", () => {
-            settleReject(new Error("Failed to initiate the main script."));
+            settleReject(new Error(`Failed to initiate the main script.${stderr ? `\n${stderr}` : ""}`));
         });
     });
 };

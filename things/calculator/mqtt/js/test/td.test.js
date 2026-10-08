@@ -37,6 +37,7 @@ describe("Calculator MQTT JS", () => {
 
     it("should have a valid TD", (done) => {
         const broker = mqtt.connect(`mqtt://${hostname}`, { port });
+        console.log(`Connecting to MQTT broker at mqtt://${hostname}:${port}`);
 
         broker.on("connect", () => {
             broker.subscribe("mqtt-calculator");
