@@ -148,6 +148,10 @@ broker.on("connect", () => {
     broker.subscribe(`${thingName}/${ACTIONS}/add`);
     broker.subscribe(`${thingName}/${ACTIONS}/subtract`);
     broker.subscribe(`${thingName}/${EVENTS}/update`);
+
+    broker.publish(`${thingName}`, JSON.stringify(thingDescription), { retain: true }, () => {
+        console.log("ThingIsReady");
+    });
 });
 
 const setResult = (value) => {
@@ -295,8 +299,3 @@ broker.on("message", (topic, payload, packet) => {
 setInterval(() => {
     broker.publish(`${thingName}/${EVENTS}/update`, "Updated the thing!");
 }, 500);
-
-broker.publish(`${thingName}`, JSON.stringify(thingDescription), {
-    retain: true,
-});
-console.log("ThingIsReady");

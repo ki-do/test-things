@@ -1,11 +1,5 @@
 #!/bin/bash
-
-# default to HTTP unless explicitly overridden.
-export HOSTNAME="127.0.0.1"
-export STACK_HOSTNAME="127.0.0.1"
-export PROTOCOL="${PROTOCOL:-http}"
-export WEB_PORT_OUT="${WEB_PORT_OUT:-80}"
-export EXTERNAL_PORT="${EXTERNAL_PORT:-80}"
+export PATH="$HOME/.local/bin:$PATH"
 
 return_value=0
 

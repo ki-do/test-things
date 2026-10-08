@@ -130,7 +130,7 @@ thingDescription = {
 const servient = new Servient();
 servient.addServer(
     new HttpServer({
-        baseUri: `${protocol}://${hostname}:${portNumber}`,
+        baseUri: `${protocol}://${hostname}`,
         port: portNumber,
     })
 );

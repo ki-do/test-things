@@ -43,41 +43,52 @@ function getPortFromArgs(cmdArgs: string[]): string | undefined {
 
 export const getInitiateMain = (mainCmd: string, cmdArgs: string[]): Promise<ThingStartResponse> => {
     return new Promise((resolve, reject) => {
-        const derivedPort = getPortFromArgs(cmdArgs);
-        
-        const thingProcess = spawn(mainCmd, cmdArgs, {
-            env: {
-                ...process.env,
-                HOSTNAME: "127.0.0.1",
-                STACK_HOSTNAME: "127.0.0.1",
-                PROTOCOL: process.env.PROTOCOL ?? "http",
-                PORT: process.env.PORT ?? derivedPort ?? "80",
-                EXTERNAL_PORT: process.env.EXTERNAL_PORT ?? derivedPort ?? "80",
-            },
-        });
+        const thingProcess = spawn(mainCmd, cmdArgs);
+        let settled = false;
 
-        // Avoids unsettled promise in case the promise is not settled in a second.
+        const settleResolve = (result: ThingStartResponse) => {
+            if (settled) {
+                return;
+            }
+            settled = true;
+            clearTimeout(timeout);
+            resolve(result);
+        };
+
+        const settleReject = (error: Error) => {
+            if (settled) {
+                return;
+            }
+            settled = true;
+            clearTimeout(timeout);
+            reject(error);
+        };
+
+        // Give things enough time to initialize transports and announce readiness.
+        const startTimeout = Number(process.env.THING_START_TIMEOUT ?? 60000);
         const timeout = setTimeout(() => {
-            reject(new Error("Thing did not start as expected."));
-        }, 1000);
+            thingProcess.kill();
+            settleReject(new Error(`Thing did not start as expected.${stderr ? `\n${stderr}` : ""}`));
+        }, startTimeout);
+
+        let stderr = "";
 
         thingProcess.stdout!.on("data", (data: Buffer) => {
             if (data.toString().includes("ThingIsReady")) {
-                clearTimeout(timeout);
-                resolve({
+                settleResolve({
                     process: thingProcess,
                     message: "Success",
                 });
             }
         });
         thingProcess.stderr!.on("data", (data: Buffer) => {
-            reject(new Error(`Process stderr: ${data}`));
+            settleReject(new Error(`Process stderr: ${data}`));
         });
         thingProcess.on("error", (error: Error) => {
-            reject(new Error(`Process error: ${error.message}`));
+            settleReject(new Error(`Process error: ${error.message}`));
         });
         thingProcess.on("close", () => {
-            reject(new Error("Failed to initiate the main script."));
+            settleReject(new Error("Failed to initiate the main script."));
         });
     });
 };

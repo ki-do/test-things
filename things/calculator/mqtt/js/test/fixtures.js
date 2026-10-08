@@ -15,10 +15,12 @@
 
 const { getInitiateMain } = require("../../../../../util/dist/util");
 const path = require("node:path");
+require("dotenv").config();
 
 let thingProcess;
 let response;
-const port = 1883;
+const port = Number(process.env.BROKER_PORT ?? 1883);
+const brokerURI = process.env.BROKER_URI ?? "localhost";
 
 exports.mochaGlobalSetup = async function () {
     try {
@@ -35,3 +37,6 @@ exports.mochaGlobalTeardown = function () {
         thingProcess.kill();
     }
 };
+
+exports.port = port;
+exports.brokerURI = brokerURI;

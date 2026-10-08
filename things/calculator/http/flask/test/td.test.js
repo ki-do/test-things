@@ -15,7 +15,9 @@ let thingProcess;
 describe("Calculator HTTP Flask", () => {
     let validate;
 
-    before(async () => {
+    before(async function () {
+        this.timeout(30000);
+
         const initiateMain = new Promise(async (resolve, reject) => {
             thingProcess = spawn("poetry", ["run", "python", "main.py"], {
                 cwd: path.join(__dirname, ".."),
